@@ -132,6 +132,8 @@ const parseLog = (logData, attackCheckbox, saveCheckbox, skillCheckbox) => {
 }
 
 const createTables = (attackCheckbox, saveCheckbox, skillCheckbox) => {
+  if(attackCheckbox === 'false' && saveCheckbox === 'false' && skillCheckbox === 'false' )
+    return
   parseLog(rawLog, attackCheckbox, saveCheckbox, skillCheckbox)
 
   let canvasIds = [0]
