@@ -52,7 +52,7 @@ const constructDetailedAttackTable = (canvasId, charName, rollCount) => {
     sum += parsedJSON[charName]['d20'][i-1] * i
   }
   avg = sum/count
-  return `<script>const ctx${canvasId}=document.getElementById('${canvasId}');const myChart${canvasId}=new Chart(ctx${canvasId},{type:'bar',data:{labels:['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20'],datasets:[{label:'Times ${charName} rolled',data:[${rollCount}],backgroundColor:['rgba(255, 99, 132, 0.2)','rgba(54, 162, 235, 0.2)','rgba(255, 206, 86, 0.2)','rgba(75, 192, 192, 0.2)','rgba(153, 102, 255, 0.2)','rgba(255, 159, 64, 0.2)'],borderColor:['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)','rgba(255, 159, 64, 1)'],borderWidth:1}]},options:{responsive:!0,plugins:{legend:{position:'top',},title:{display:!0,text:'Detailed rolls for ${charName} (${rollCount.reduce((partialSum, a) => partialSum + a, 0)} rolls, Avg: ${avg.toFixed(3)})'}}}})</script>`
+  return `<script>const ctx${canvasId}=document.getElementById('${canvasId}');const myChart${canvasId}=new Chart(ctx${canvasId},{type:'bar',data:{labels:['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20'],datasets:[{label:'Times ${charName} rolled',data:[${rollCount}],backgroundColor:['rgba(255, 99, 132, 0.2)','rgba(54, 162, 235, 0.2)','rgba(255, 206, 86, 0.2)','rgba(75, 192, 192, 0.2)','rgba(153, 102, 255, 0.2)','rgba(255, 159, 64, 0.2)'],borderColor:['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)','rgba(255, 159, 64, 1)'],borderWidth:1}]},options:{responsive:!0,plugins:{legend:{position:'top',},title:{display:!0,text:'Detailed rolls for ${charName} (${rollCount.reduce((partialSum, a) => partialSum + a, 0)} rolls, Avg: ${avg?avg.toFixed(3):0})'}}}})</script>`
 }
 
 const parseLog = (logData, attackCheckbox, saveCheckbox, skillCheckbox) => {
@@ -132,7 +132,7 @@ const parseLog = (logData, attackCheckbox, saveCheckbox, skillCheckbox) => {
 }
 
 const createTables = (attackCheckbox, saveCheckbox, skillCheckbox) => {
-  if(attackCheckbox === 'false' && saveCheckbox === 'false' && skillCheckbox === 'false' )
+  if((!attackCheckbox || attackCheckbox === 'false') && (!saveCheckbox || saveCheckbox === 'false') && (!skillCheckbox || skillCheckbox === 'false') )
     return
   parseLog(rawLog, attackCheckbox, saveCheckbox, skillCheckbox)
 

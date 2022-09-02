@@ -34,7 +34,6 @@
     datePicker.addEventListener('change', (event) => {
         let path = event.path || (event.composedPath && event.composedPath());
         selector = path[0].name
-        console.log(event.target.value)
         searchParams.set(selector, event.target.value);
         window.location.search = searchParams.toString();
     });
@@ -64,17 +63,12 @@
     });
 
     if(searchParams.get('attack'))
-    {
         document.getElementById("checkbox_attack").checked = (searchParams.get('attack') === 'true');
-    }
     if(searchParams.get('skill'))
-    {
         document.getElementById("checkbox_skill").checked = (searchParams.get('skill') === 'true');
-    }
     if(searchParams.get('save'))
-    {
         document.getElementById("checkbox_save").checked = (searchParams.get('save') === 'true');
-    }
+
 </script>
 
 {{ summaryTable }}
