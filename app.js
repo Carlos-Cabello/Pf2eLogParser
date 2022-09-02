@@ -2,6 +2,12 @@ import express from 'express'
 import {Liquid} from 'liquidjs'
 import fileUpload from 'express-fileupload'
 import {readFile} from 'fs'
+import * as dotenv from 'dotenv'
+dotenv.config()
+
+
+let HAVE_LOG = false
+const port = process.env.PORT
 
 const MIN_DATE = '7/26/2022, 11:59:01 AM'
 const ATTACK_SELECTOR = '<h4 class="action">'
@@ -23,6 +29,11 @@ const constructDetailedAttackTable = (canvasId, charName, rollCount) => {
 }
 
 const parseLog = (logData) => {
+  if(!HAVE_LOG)
+  {
+    console.log("No log to parse")
+    return
+  }
   const allEvents = logData.split('---------------------------')
 
   // Initialize JSON
@@ -69,6 +80,7 @@ const loadLog = (logPath) => {
     if (err) {
       return console.log(err)
     }
+    HAVE_LOG = true
     parseLog(data)
   })
 }
@@ -92,8 +104,6 @@ const createTables = () => {
     rollAverages.push(avg)
   })
 
-  
-
   return {canvasIds: canvasIds, summaryTable: constructSummaryTable(canvasIds[0], RELEVANT_ACTORS, rollAverages), detailedTables: detailedTables}
 }
 
@@ -110,17 +120,22 @@ const main = () => {
   app.set('views', './views')            // specify the views directory
   app.set('view engine', 'liquid')       // set liquid to default
   app.use(fileUpload())
-  
-  const port = 8070
 
-  loadLog("./chat.log")
-
-  app.get('/', (_, res) => {
-    res.render('index', createTables())
+  app.get('/', (req, res) => {
+    if(HAVE_LOG){
+      res.render('index', createTables())
+    }
+    else{
+      res.render('log_missing')
+    }
   })
 
   app.get('/upload', (_, res) =>{
-    res.render('upload')
+    const context = {
+      server: process.env.SERVER,
+      port: process.env.PORT
+    }
+    res.render('upload', context)
   })
 
   app.post('/upload', function(req, res) {
@@ -139,13 +154,13 @@ const main = () => {
     chatFile.mv(uploadPath, function(err) {
       if (err)
         return res.status(500).send(err)
-  
-      res.send('File uploaded!')
+      loadLog("./chat.log")
+      res.send('File uploaded! <a href="/">Back</a>')
     })
   })
   
   app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+    console.log(`Foundry log analyzer listening on port ${port}`)
   })  
 }
 
