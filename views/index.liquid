@@ -31,7 +31,8 @@
     const attackCheckbox = document.getElementById('checkbox_attack');
 
     attackCheckbox.addEventListener('change', (event) => {
-        selector = event.path[0].name
+        let path = event.path || (event.composedPath && event.composedPath());
+        selector = path[0].name
         searchParams.set(selector, event.target.checked);
         window.location.search = searchParams.toString();
     });
@@ -39,7 +40,8 @@
     const saveCheckbox = document.getElementById('checkbox_save');
 
     saveCheckbox.addEventListener('change', (event) => {
-        selector = event.path[0].name
+        let path = event.path || (event.composedPath && event.composedPath());
+        selector = path[0].name
         searchParams.set(selector, event.target.checked);
         window.location.search = searchParams.toString();
     });
@@ -47,7 +49,8 @@
     const skillCheckbox = document.getElementById('checkbox_skill');
 
     skillCheckbox.addEventListener('change', (event) => {
-        selector = event.path[0].name
+        let path = event.path || (event.composedPath && event.composedPath());
+        selector = path[0].name
         searchParams.set(selector, event.target.checked);
         window.location.search = searchParams.toString();
     });
