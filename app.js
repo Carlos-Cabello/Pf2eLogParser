@@ -34,12 +34,27 @@ const DAMAGE_SELECTOR = '<strong>Damage Roll'
 const RELEVANT_ACTORS = ['Groaa','Blut','Twilight','Thorondor', 'DM']
 
 let rawLog = ""
+
+/* 
+  JSON Structure
+  {
+    CharName: {
+      d20: [array with 20 0s, 1 for each d20 die face]
+      damage: [timesCharDealtDamage, totalDamage]
+    }
+  }
+*/
 let parsedJSON = {}
 
 
-const constructSummaryTable = (canvasId, charNames, rollAverages) => {
+const constructD20SummaryTable = (canvasId, charNames, rollAverages) => {
   const goodCharNames = charNames.map(d => `'${d}'`).join(',');
-  return `<script>const ctx${canvasId}=document.getElementById('${canvasId}');const myChart${canvasId}=new Chart(ctx${canvasId},{type:'bar',data:{labels:[${goodCharNames}],datasets:[{label:'Roll Average',data:[${rollAverages}],backgroundColor:['rgba(255, 99, 132, 0.2)','rgba(54, 162, 235, 0.2)','rgba(255, 206, 86, 0.2)','rgba(75, 192, 192, 0.2)','rgba(153, 102, 255, 0.2)','rgba(255, 159, 64, 0.2)'],borderColor:['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)','rgba(255, 159, 64, 1)'],borderWidth:1}]},options:{responsive:!0,base:0,plugins:{legend:{position:'top',},title:{display:!0,text:'Average for all players'}}}})</script>`
+  return `<script>const ctx${canvasId}=document.getElementById('${canvasId}');const myChart${canvasId}=new Chart(ctx${canvasId},{type:'bar',data:{labels:[${goodCharNames}],datasets:[{label:'Roll Average',data:[${rollAverages}],backgroundColor:['rgba(255, 99, 132, 0.2)','rgba(54, 162, 235, 0.2)','rgba(255, 206, 86, 0.2)','rgba(75, 192, 192, 0.2)','rgba(153, 102, 255, 0.2)','rgba(255, 159, 64, 0.2)'],borderColor:['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)','rgba(255, 159, 64, 1)'],borderWidth:1}]},options:{responsive:!0,base:0,plugins:{legend:{position:'top',},title:{display:!0,text:'Average d20 rolls for all players'}}}})</script>`
+}
+
+const constructDamageSummaryTable = (canvasId, charNames, rollAverages) => {
+  const goodCharNames = charNames.map(d => `'${d}'`).join(',');
+  return `<script>const ctx${canvasId}=document.getElementById('${canvasId}');const myChart${canvasId}=new Chart(ctx${canvasId},{type:'bar',data:{labels:[${goodCharNames}],datasets:[{label:'Damage Average',data:[${rollAverages}],backgroundColor:['rgba(255, 99, 132, 0.2)','rgba(54, 162, 235, 0.2)','rgba(255, 206, 86, 0.2)','rgba(75, 192, 192, 0.2)','rgba(153, 102, 255, 0.2)','rgba(255, 159, 64, 0.2)'],borderColor:['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)','rgba(255, 159, 64, 1)'],borderWidth:1}]},options:{responsive:!0,base:0,plugins:{legend:{position:'top',},title:{display:!0,text:'Average damage for all players'}}}})</script>`
 }
 
 // rollCount = {n} for n = 20 (# of times each d20 face appeared for a given player)
@@ -52,10 +67,10 @@ const constructDetailedAttackTable = (canvasId, charName, rollCount) => {
     sum += parsedJSON[charName]['d20'][i-1] * i
   }
   avg = sum/count
-  return `<script>const ctx${canvasId}=document.getElementById('${canvasId}');const myChart${canvasId}=new Chart(ctx${canvasId},{type:'bar',data:{labels:['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20'],datasets:[{label:'Times ${charName} rolled',data:[${rollCount}],backgroundColor:['rgba(255, 99, 132, 0.2)','rgba(54, 162, 235, 0.2)','rgba(255, 206, 86, 0.2)','rgba(75, 192, 192, 0.2)','rgba(153, 102, 255, 0.2)','rgba(255, 159, 64, 0.2)'],borderColor:['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)','rgba(255, 159, 64, 1)'],borderWidth:1}]},options:{responsive:!0,plugins:{legend:{position:'top',},title:{display:!0,text:'Detailed rolls for ${charName} (${rollCount.reduce((partialSum, a) => partialSum + a, 0)} rolls, Avg: ${avg?avg.toFixed(3):0})'}}}})</script>`
+  return `<script>const ctx${canvasId}=document.getElementById('${canvasId}');const myChart${canvasId}=new Chart(ctx${canvasId},{type:'bar',data:{labels:['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20'],datasets:[{label:'Times ${charName} rolled',data:[${rollCount}],backgroundColor:['rgba(255, 99, 132, 0.2)','rgba(54, 162, 235, 0.2)','rgba(255, 206, 86, 0.2)','rgba(75, 192, 192, 0.2)','rgba(153, 102, 255, 0.2)','rgba(255, 159, 64, 0.2)'],borderColor:['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)','rgba(255, 159, 64, 1)'],borderWidth:1}]},options:{responsive:!0,plugins:{legend:{position:'top',},title:{display:!0,text:'Detailed d20 rolls for ${charName} (${rollCount.reduce((partialSum, a) => partialSum + a, 0)} rolls, Avg: ${avg?avg.toFixed(3):0})'}}}})</script>`
 }
 
-const parseLog = (logData, attackCheckbox, saveCheckbox, skillCheckbox) => {
+const parseLog = (logData, attackCheckbox, saveCheckbox, skillCheckbox, damageCheckbox) => {
   if(logData === "")
     return
 
@@ -69,9 +84,9 @@ const parseLog = (logData, attackCheckbox, saveCheckbox, skillCheckbox) => {
     if(actorNameWithInitialSpace){
       const actorName = actorNameWithInitialSpace.substring(1)
       if(RELEVANT_ACTORS.includes(actorName)){
-        parsedJSON[actorName] = {d20: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], damage:[]}
+        parsedJSON[actorName] = {d20: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], damage:[0, 0]}
       }
-      parsedJSON['DM'] = {d20: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], damage:[]}
+      parsedJSON['DM'] = {d20: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], damage:[0, 0]}
     }
   })
 
@@ -126,35 +141,84 @@ const parseLog = (logData, attackCheckbox, saveCheckbox, skillCheckbox) => {
             }
           }
         }
+        // Get all damage rolls
+        /*
+        This has a bug. Sometimes, damage does not have any tag. For example, this is damage from a breathe weapon. 
+        The current code ignores this damage
+        TODO: Fix
+        ---------------------------
+        [8/29/2022, 8:43:02 PM] Thorondor
+        38
+        8d8 cold
+        {8d8}[cold] = 38 = 38
+        ---------------------------
+        */
+        if(event.includes(DAMAGE_SELECTOR) && damageCheckbox === 'true'){
+          const actorNameWithInitialSpace = allLinesInEvent.at(1).split(']')[1]
+          // Check if we are in a valid actor
+          if(actorNameWithInitialSpace){
+            const actorName = actorNameWithInitialSpace.substring(1)
+            const damage = allLinesInEvent.at(-2).split('=')[1]
+            if(RELEVANT_ACTORS.includes(actorName)){
+              parsedJSON[actorName]['damage'][0] += 1
+              parsedJSON[actorName]['damage'][1] += parseInt(damage)
+            }
+            else{
+              parsedJSON['DM']['damage'][0] += 1
+              parsedJSON['DM']['damage'][1] += parseInt(damage)
+            }
+          }
+        }
       }
     }
   })
 }
 
-const createTables = (attackCheckbox, saveCheckbox, skillCheckbox) => {
+const createTables = (attackCheckbox, saveCheckbox, skillCheckbox, damageCheckbox) => {
+  let haveD20 = true
+  let haveDamage = false
   if((!attackCheckbox || attackCheckbox === 'false') && (!saveCheckbox || saveCheckbox === 'false') && (!skillCheckbox || skillCheckbox === 'false') )
+    haveD20 = false
+  if((!damageCheckbox || damageCheckbox === 'false') && !haveD20)
     return
-  parseLog(rawLog, attackCheckbox, saveCheckbox, skillCheckbox)
+  else
+    haveDamage = true
 
-  let canvasIds = [0]
+  parseLog(rawLog, attackCheckbox, saveCheckbox, skillCheckbox, damageCheckbox)
+
+  let canvasIds = [0, 1]
   let detailedTables = []
   let rollAverages = []
+  let damageAverages = []
 
-  RELEVANT_ACTORS.forEach(actor => {
-    canvasIds.push(actor)
-    detailedTables.push(constructDetailedAttackTable(actor, actor, parsedJSON[actor]['d20']))
-    let sum = 0
-    let count = 0
-    let avg = 0
-    for(let i = 1; i <= parsedJSON[actor]['d20'].length; i++){
-      count += parsedJSON[actor]['d20'][i-1]
-      sum += parsedJSON[actor]['d20'][i-1] * i
-    }
-    avg = sum/count
-    rollAverages.push(avg)
-  })
+  if(haveD20){
+    RELEVANT_ACTORS.forEach(actor => {
+      canvasIds.push(actor)
+      detailedTables.push(constructDetailedAttackTable(actor, actor, parsedJSON[actor]['d20']))
+      let sum = 0
+      let count = 0
+      let avg = 0
+      for(let i = 1; i <= parsedJSON[actor]['d20'].length; i++){
+        count += parsedJSON[actor]['d20'][i-1]
+        sum += parsedJSON[actor]['d20'][i-1] * i
+      }
+      avg = sum/count
+      rollAverages.push(avg)
+    })
+  }
 
-  return {canvasIds: canvasIds, summaryTable: constructSummaryTable(canvasIds[0], RELEVANT_ACTORS, rollAverages), detailedTables: detailedTables}
+  if(haveDamage)
+  {
+    RELEVANT_ACTORS.forEach(actor => {
+      damageAverages.push(parsedJSON[actor]['damage'][1] / parsedJSON[actor]['damage'][0])
+    })
+  }
+
+  return {canvasIds: canvasIds,
+          attackTable: haveD20?constructD20SummaryTable(canvasIds[0], RELEVANT_ACTORS, rollAverages):undefined,
+          damageTable: haveDamage?constructDamageSummaryTable(canvasIds[1], RELEVANT_ACTORS, damageAverages):undefined,
+          detailedTables: detailedTables
+  }
 }
 
 
@@ -176,7 +240,7 @@ const main = () => {
       if(req.query.startDate){
         MIN_DATE = req.query.startDate
       }
-      res.render('index', createTables(req.query.attack, req.query.save, req.query.skill))
+      res.render('index', createTables(req.query.attack, req.query.save, req.query.skill, req.query.damage))
     }
     else{
       res.render('log_missing')

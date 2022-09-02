@@ -13,6 +13,8 @@
         <label for="checkbox_saves">Save Rolls</label>
         <input type="checkbox" id="checkbox_skill" name="skill" value="Skill Rolls">
         <label for="checkbox_skills">Skill Check Rolls</label>
+        <input type="checkbox" id="checkbox_damage" name="damage" value="Damage Average">
+        <label for="checkbox_damage">Damage Average</label>
         <input type="date" id="startDatePicker" name="startDate">
         <label for="startDatePicker">Start Date</label>
     </div>
@@ -35,6 +37,14 @@
         let path = event.path || (event.composedPath && event.composedPath());
         selector = path[0].name
         searchParams.set(selector, event.target.value);
+        window.location.search = searchParams.toString();
+    });
+
+    const damageCheckbox = document.getElementById('checkbox_damage');
+    damageCheckbox.addEventListener('change', (event) => {
+        let path = event.path || (event.composedPath && event.composedPath());
+        selector = path[0].name
+        searchParams.set(selector, event.target.checked);
         window.location.search = searchParams.toString();
     });
 
@@ -68,11 +78,13 @@
         document.getElementById("checkbox_skill").checked = (searchParams.get('skill') === 'true');
     if(searchParams.get('save'))
         document.getElementById("checkbox_save").checked = (searchParams.get('save') === 'true');
+    if(searchParams.get('damage'))
+        document.getElementById("checkbox_damage").checked = (searchParams.get('damage') === 'true');
 
 </script>
 
-{{ summaryTable }}
-
+{{ attackTable }}
+{{ damageTable }}
 {% for table in detailedTables %}
 {{table}}
 {% endfor %}
