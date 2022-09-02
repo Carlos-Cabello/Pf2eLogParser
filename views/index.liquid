@@ -13,6 +13,8 @@
         <label for="checkbox_saves">Save Rolls</label>
         <input type="checkbox" id="checkbox_skill" name="skill" value="Skill Rolls">
         <label for="checkbox_skills">Skill Check Rolls</label>
+        <input type="date" id="startDatePicker" name="startDate">
+        <label for="startDatePicker">Start Date</label>
     </div>
     {% for canvasId in canvasIds %}
         <div style="width:800px;height:600px;">
@@ -28,8 +30,16 @@
 <script>
     var searchParams = new URLSearchParams(window.location.search);
 
-    const attackCheckbox = document.getElementById('checkbox_attack');
+    const datePicker = document.getElementById('startDatePicker');
+    datePicker.addEventListener('change', (event) => {
+        let path = event.path || (event.composedPath && event.composedPath());
+        selector = path[0].name
+        console.log(event.target.value)
+        searchParams.set(selector, event.target.value);
+        window.location.search = searchParams.toString();
+    });
 
+    const attackCheckbox = document.getElementById('checkbox_attack');
     attackCheckbox.addEventListener('change', (event) => {
         let path = event.path || (event.composedPath && event.composedPath());
         selector = path[0].name
@@ -38,7 +48,6 @@
     });
 
     const saveCheckbox = document.getElementById('checkbox_save');
-
     saveCheckbox.addEventListener('change', (event) => {
         let path = event.path || (event.composedPath && event.composedPath());
         selector = path[0].name
@@ -47,7 +56,6 @@
     });
 
     const skillCheckbox = document.getElementById('checkbox_skill');
-
     skillCheckbox.addEventListener('change', (event) => {
         let path = event.path || (event.composedPath && event.composedPath());
         selector = path[0].name

@@ -173,7 +173,6 @@ const main = () => {
     if(HAVE_LOG){
       if(req.query.startDate){
         MIN_DATE = req.query.startDate
-        console.log(MIN_DATE)
       }
       res.render('index', createTables(req.query.attack, req.query.save, req.query.skill))
     }
