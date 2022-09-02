@@ -176,13 +176,11 @@ const parseLog = (logData, attackCheckbox, saveCheckbox, skillCheckbox, damageCh
 
 const createTables = (attackCheckbox, saveCheckbox, skillCheckbox, damageCheckbox) => {
   let haveD20 = true
-  let haveDamage = false
+  let haveDamage = true
   if((!attackCheckbox || attackCheckbox === 'false') && (!saveCheckbox || saveCheckbox === 'false') && (!skillCheckbox || skillCheckbox === 'false') )
     haveD20 = false
-  if((!damageCheckbox || damageCheckbox === 'false') && !haveD20)
-    return
-  else
-    haveDamage = true
+  if(!damageCheckbox || damageCheckbox === 'false')
+    haveDamage = false
 
   parseLog(rawLog, attackCheckbox, saveCheckbox, skillCheckbox, damageCheckbox)
 
